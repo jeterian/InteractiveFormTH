@@ -4,11 +4,6 @@
   Unit 3 - Interactive Form
 */
 
-// Variables
-var jobRole = $("select#title");
-var designSel = document.getElementById("design");
-var colorSel = document.getElementById("color");
-
 // Focus for first box when page loads
 $(':input:enabled:visible:first').focus();
 
@@ -17,6 +12,7 @@ $(':input:enabled:visible:first').focus();
   $("#other-title").hide();
 
   // Changes whether the box appears depending on whether "Other" is selected
+  var jobRole = $("select#title");
   var jobRoleSelect = function () {
     var jobRoles = jobRole.val();
     if (jobRoles == "other") {
@@ -26,9 +22,11 @@ $(':input:enabled:visible:first').focus();
     }
 }
 
-// calls function
-jobRole.change(function(e) {
-    jobRoleSelect();
-});
+  // calls function
+  jobRole.change(function(e) {
+      jobRoleSelect();
+    });
 
 // T-Shirt Info
+var designSel = document.getElementById("design");
+var colorSel = document.getElementById("color");
