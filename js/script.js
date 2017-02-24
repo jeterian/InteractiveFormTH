@@ -9,8 +9,36 @@ $(':input:enabled:visible:first').focus();
 
 // Job Role - reveal text field when "other" option is selected
   // Hide text box initially
-  $("#other-title").hide();
+$("#other-title").hide();
 
+// T-Shirt Info
+  // variables and initializations for starting form
+var shirtDes = $('#design');
+var shirtCol = $('#color');
+shirtDes.find('option').first().val('default');
+shirtCol.prepend('<option value="default">Select Color</option>').hide();
+shirtCol.val('default');
+
+shirtDes.change(function(){
+   var choice = $(this).val();
+
+   shirtCol.find('option').each(function(){
+     var text = $(this).text().toLowerCase().replace('♥', 'heart');
+     $(this).hide();
+
+     if(new RegExp(choice).test(text)){
+       $(this).show();
+     }
+   });
+
+   var displayProp = (choice !== 'default') ? 'block' : 'none';
+
+   shirtCol.attr('style', 'display:' + displayProp);
+   shirtCol.val('default');
+ });
+
+
+// Job Roles
   // Changes whether the box appears depending on whether "Other" is selected
   var jobRole = $("select#title");
   var jobRoleSelect = function () {
@@ -26,7 +54,3 @@ $(':input:enabled:visible:first').focus();
   jobRole.change(function(e) {
       jobRoleSelect();
     });
-
-// T-Shirt Info
-var designSel = document.getElementById("design");
-var colorSel = document.getElementById("color");
