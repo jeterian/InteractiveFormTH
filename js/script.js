@@ -9,7 +9,6 @@ var payment = $('#payment');
 var realtimeField = $('#name');
 var activities = $('.activities');
 
-
 // Focus for first box when page loads
 $(':input:enabled:visible:first').focus();
 
@@ -65,8 +64,15 @@ shirtCol.val('default');
   // attach event handler
   activities.on('click', 'input', function(event){
 
-    // returns the activity checkbox info
-    function getActivityStr(){
+    //variables
+    var target = this;
+    var checkboxes = activities.find('input');
+    var checked = $(this).is(':checked');
+    var selected = getActivity(activityStr.call(this))[2] + ' ' + getActivity(activityStr.call(this))[1];
+    var total = 0;
+
+    // returns which activities are selected via checkboxes
+    function activityStr(){
       return $(this).parent().text().toLowerCase();
     }
 
@@ -74,79 +80,67 @@ shirtCol.val('default');
       return activityStr.split(' ').reverse();
     }
 
-    var target = this;
-    var checkboxes = activities.find('input');  // returns array of checkbox elements
-    var checked = $(this).is(':checked'); // determines whether the checkbox is being checked or unchecked
-    var selected = getActivity(getActivityStr.call(this))[2] + ' ' + getActivity(getActivityStr.call(this))[1];  // isolates the target checkbox string's activity time
-    var total = 0;
-
-
     checkboxes.each(function(){
-      var currActivityStr = getActivityStr.call(this);
+      var selActivity = activityStr.call(this);
 
-      // first condition excludes the targeted checkbox from the loop
-      // second condition checks if the activity times strings are the same
-      if(getActivityStr.call(target) !== currActivityStr && (getActivity(currActivityStr)[2] + ' ' + getActivity(currActivityStr)[1]) === selected){
+      // Excludes the selected checkbox from loop and checks time strings for the various activities
+      if(activityStr.call(target) !== selActivity && (getActivity(selActivity)[2] + ' ' + getActivity(selActivity)[1]) === selected){
         $(this).attr('disabled', checked);
       }
 
-      // if the checkbox is checked, convert currency string to a number and add that number to the amount variable
+      // when a checkbox is selected, calculates the price
       if($(this).is(':checked')){
-        var amount = Number(getActivity(currActivityStr)[0].replace('$', ''));
-        total += amount;
+        var price = Number(getActivity(selActivity)[0].replace('$', ''));
+        total += price;
       }
     });
 
     activities.find('.total').remove();
-
     activities.append(function(){
       return '<div class="total">Total: $' + total + '</div>';
     });
   });
 
-
-  function changePaymentMethod(){
+// Payment Info
+  // Show or Hide Credit Card info depending upon choice of payment method
+  function payMethod(){
     var selection = $(this).val().replace(' ', '-');
     var creditCard = $('#credit-card');
     var parent = $(this).closest('fieldset');
-
     $('div:has(> p)').children('p').hide();
 
     if(selection !== 'credit-card'){
       creditCard.hide();
-
       parent.find('p').each(function(){
-        var textString = $(this).text().toLowerCase();
-
+        var text = $(this).text().toLowerCase();
         $(this).hide();
-
-        if(new RegExp(selection).test(textString)){
+        if(new RegExp(selection).test(text)){
           $(this).show();
         }
       });
-
     }else{
       creditCard.show();
     }
-  }
-  payment.change(changePaymentMethod);
-  changePaymentMethod.call(payment);
+  };
 
+  payment.change(payMethod);
+  payMethod.call(payment);
 
-  function formSubmit(event){
+// Submit form and check for errors
+  function submission(event){
     var name = $('#name').val();
     var email = $('#mail');
-    var activitiesCheckbox = activities.find('input[type="checkbox"]');
+    var selActivities = activities.find('input[type="checkbox"]');
     var paymentMethod = payment.val();
     var zipCode = $('#zip').val();
     var cvv = $('#cvv').val();
 
-    var emailCheck = /^([\w]+)@([\w]+)\.([\D]){2,4}$/;
-    var activityChecked;
+    var checkEmail = /^([\w]+)@([\w]+)\.([\D]){2,4}$/;
+    var checkActivities;
     var errors = [];
 
     // simulate failed form submission and display errors
-    function formError(message){
+    function errorMessage(message){
       if(event.type === 'submit'){
         event.preventDefault();
       }
@@ -156,65 +150,65 @@ shirtCol.val('default');
     $(this).find('.submission-errors').remove();
 
     if(name === ''){
-      formError('Please enter your name.');
+      errorMessage('Please enter your name.');
 
     }else if(name.length < 2){
-      formError('Please enter a valid name.');
+      errorMessage('Please enter a valid name.');
     }
 
-    if(!emailCheck.test(email.val())){
-      formError('Please enter a valid email address.');
+    if(!checkEmail.test(email.val())){
+      errorMessage('Please enter a valid email address.');
     }
 
-    activitiesCheckbox.each(function(){
+    selActivities.each(function(){
       if($(this).prop('checked')){
-        activityChecked = true;
+        checkActivities = true;
       }
     });
 
-    if(!activityChecked){
-      formError('You must choose at least one activity.');
+    if(!checkActivities){
+      errorMessage('You must choose at least one activity.');
     }
 
     if(paymentMethod === 'credit card'){
       var creditCard = $('#cc-num').val();
 
       if(creditCard === ''){
-        formError('Enter your credit card number.');
+        errorMessage('Enter your credit card number.');
 
       }else if(!(creditCard.length > 12 && creditCard.length < 17)){
-        formError('Credit cards should have 13 to 16 digits.');
+        errorMessage('Credit cards should have 13 to 16 digits.');
 
       }else if(isNaN(Number(creditCard))){
-        formError('Please only enter numbers for your credit card.');
+        errorMessage('Please only enter numbers for your credit card.');
       }
 
       if(zipCode.length !== 5){
-        formError('Your zip code should be five digits.');
+        errorMessage('Your zip code should be five digits.');
 
       }else if(isNaN(Number(zipCode))){
-        formError('Please enter numbers for Zip Code.');
+        errorMessage('Please enter numbers for Zip Code.');
       }
 
       if(cvv.length !== 3){
-        formError('There should be three digits for CVV code.');
+        errorMessage('There should be three digits for CVV code.');
 
       }else if(isNaN(Number(cvv))){
-        formError('Please enter numbers for CVV code.');
+        errorMessage('Please enter numbers for CVV code.');
       }
     }
 
-    // outputs form errors to the page
+    // Upon submission, outputs error messages at top of page
     if(errors.length > 0){
-      var formErrors = '';
+      var errorMessages = '';
 
       errors.forEach(function(value){
-        formErrors += '<p>' + value + '</p>';
+        errorMessages += '<p>' + value + '</p>';
       });
 
-      $(this).prepend('<div style="color:red" class="submission-errors">' + formErrors + '</div>');
+      $(this).prepend('<div style="color:red" class="submission-errors">' + errorMessages + '</div>');
       $(window).scrollTop(0);
     }
   }
-  realtimeField.bind('keyup', $.proxy(formSubmit, form));
-  form.submit(formSubmit);
+  realtimeField.bind('keyup', $.proxy(submission, form));
+  form.submit(submission);
