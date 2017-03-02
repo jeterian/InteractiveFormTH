@@ -147,7 +147,7 @@ shirtCol.val('default');
       errors.push(message);
     }
 
-    $(this).find('.submission-errors').remove();
+    $(this).find('.submitError').remove();
 
     if(name === ''){
       errorMessage('Please enter your name.');
@@ -206,7 +206,7 @@ shirtCol.val('default');
         errorMessages += '<p>' + value + '</p>';
       });
 
-      $(this).prepend('<div style="color:red" class="submission-errors">' + errorMessages + '</div>');
+      $(this).prepend('<div style="color:tomato" class="submitError">' + errorMessages + '</div>');
       $(window).scrollTop(0);
     }
   }
