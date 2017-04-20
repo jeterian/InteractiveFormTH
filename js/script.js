@@ -4,10 +4,14 @@
   Unit 3 - Interactive Form
 */
 'use strict';
+
+// variables
 var form = $('form');
 var payment = $('#payment');
 var realtimeField = $('#name');
 var activities = $('.activities');
+var shirtDes = $('#design');
+var shirtCol = $('#color');
 
 // Focus for first box when page loads
 $(':input:enabled:visible:first').focus();
@@ -17,30 +21,29 @@ $(':input:enabled:visible:first').focus();
 $("#other-title").hide();
 
 // T-Shirt Info
+
   // variables and initializations for starting form
-var shirtDes = $('#design');
-var shirtCol = $('#color');
-shirtDes.find('option').first().val('default');
-shirtCol.prepend('<option value="default">Select Color</option>').hide();
-shirtCol.val('default');
+  shirtDes.find('option').first().val('default');
+  shirtCol.prepend('<option value="default">Select Color</option>').hide();
+  shirtCol.val('default');
 
-shirtDes.change(function () {
-  var choice = $(this).val();
+  shirtDes.change(function () {
+    var choice = $(this).val();
 
-  shirtCol.find('option').each(function () {
-    var text = $(this).text().toLowerCase().replace('♥', 'heart');
-    $(this).hide();
+    shirtCol.find('option').each(function () {
+      var text = $(this).text().toLowerCase().replace('♥', 'heart');
+      $(this).hide();
 
-    if (new RegExp(choice).test(text)) {
-      $(this).show();
-    }
+      if (new RegExp(choice).test(text)) {
+        $(this).show();
+      }
+    });
+
+  var displayProp = (choice !== 'default') ? 'block' : 'none';
+
+  shirtCol.attr('style', 'display:' + displayProp);
+  shirtCol.val('default');
   });
-
-var displayProp = (choice !== 'default') ? 'block' : 'none';
-
-shirtCol.attr('style', 'display:' + displayProp);
-shirtCol.val('default');
-});
 
 
 // Job Roles
@@ -168,6 +171,14 @@ shirtCol.val('default');
 
     if(!checkActivities){
       errorMessage('You must choose at least one activity.');
+    }
+
+    if(paymentMethod === 'select_method'){
+      errorMessage('Please choose a payment method.');
+    }
+
+    if(shirtDes === 'select_theme'){
+      errorMessage('Please choose a theme for your awesome t-shirt!');
     }
 
     if(paymentMethod === 'credit card'){
